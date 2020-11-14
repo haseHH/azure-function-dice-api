@@ -1,0 +1,63 @@
+name: $(BuildDefinitionName)_$(Date:yyyy-MM-dd).$(Rev:r)
+
+trigger:
+  branches:
+    include:
+    - master
+  paths:
+    include:
+    - arm-templates\infrastructure\*
+    - azure-pipelines\build-infrastructure\*
+
+jobs:
+- job: ARMInfrastructure
+  displayName: Validation and DEV Deployment
+  pool:
+    vmImage: 'windows-latest'
+  variables:
+    azureSubscriptionId: 'f10e7868-cfda-4bf8-b2ba-8c6e30bc3c74'
+    azureLocation: 'West Europe'
+    resourceGroupName: 'che-dev-api-function-we'
+    templateBasePath: 'arm-templates\infrastructure'
+    templateName: 'azuredeploy.json'
+    templateParametersName: 'azuredeploy.parameters-dev.json'
+
+  steps:
+    - checkout: self
+      clean: true
+
+    - task: AzureResourceManagerTemplateDeployment@3
+      displayName: 'Validate Template'
+      inputs:
+        deploymentScope: 'Resource Group'
+        azureResourceManagerConnection: 'ics-msdn'
+        subscriptionId: '$(azureSubscriptionId)'
+        action: 'Create Or Update Resource Group'
+        resourceGroupName: '$(resourceGroupName)'
+        location: '$(azureLocation)'
+        templateLocation: 'Linked artifact'
+        csmFile: '$(templateBasePath)\$(templateName)'
+        csmParametersFile: '$(templateBasePath)\$(templateParametersName)'
+        deploymentMode: 'Validation'
+
+    - task: AzureResourceManagerTemplateDeployment@3
+      displayName: 'Deploy Template to DEV'
+      inputs:
+        deploymentScope: 'Resource Group'
+        azureResourceManagerConnection: 'ics-msdn'
+        subscriptionId: '$(azureSubscriptionId)'
+        action: 'Create Or Update Resource Group'
+        resourceGroupName: '$(resourceGroupName)'
+        location: '$(azureLocation)'
+        templateLocation: 'Linked artifact'
+        csmFile: '$(templateBasePath)\$(templateName)'
+        csmParametersFile: '$(templateBasePath)\$(templateParametersName)'
+        deploymentMode: 'Incremental'
+
+    - task: PublishBuildArtifacts@1
+      displayName: 'Publish Artifact'
+      inputs:
+        PathtoPublish: '$(templateBasePath)'
+        ArtifactName: 'arm-templates'
+        publishLocation: Container
+      condition: always()
