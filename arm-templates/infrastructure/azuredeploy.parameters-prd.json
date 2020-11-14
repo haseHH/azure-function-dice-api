@@ -1,0 +1,21 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "storageAccountName": {
+            "value": "cheprdapifunctionsa"
+        },
+        "logAnalyticsWorkspaceName": {
+            "value": "che-prd-api-function-law"
+        },
+        "applicationInsightsName": {
+            "value": "che-prd-api-function-ai"
+        },
+        "consumptionPlanName": {
+            "value": "che-prd-api-function-asp"
+        },
+        "functionAppName": {
+            "value": "che-prd-api-function-fa"
+        }
+    }
+}
