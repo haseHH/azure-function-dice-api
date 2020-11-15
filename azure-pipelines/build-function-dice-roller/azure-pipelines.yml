@@ -1,0 +1,50 @@
+name: $(BuildDefinitionName)_$(Date:yyyy-MM-dd).$(Rev:r)
+
+trigger:
+  branches:
+    include:
+    - master
+  paths:
+    include:
+    - api-functions.main\dice-roller\*
+    - azure-pipelines\build-function-app\*
+
+jobs:
+- job: FunctionApp
+  displayName: Build and DEV Deployment
+  pool:
+    vmImage: 'windows-latest'
+    demands:
+      - DotNetFramework
+      - azureps
+  variables:
+    functionProjectPath: 'api-functions.main\dice-roller'
+    functionType: 'dotnet'
+    functionAppName: 'che-dev-api-function-fa'
+
+  steps:
+    - checkout: self
+      clean: true
+
+    - task: FuncToolsInstaller@0
+      displayName: Install function tools
+      inputs:
+        version: '3.0.2996'
+
+    - task: AzureCLI@2
+      displayName: Deployment
+      inputs:
+        azureSubscription: 'ics-msdn'
+        scriptType: 'ps'
+        scriptLocation: 'inlineScript'
+        inlineScript: |
+          cd $(Build.SourcesDirectory)/$(functionProjectPath)
+          func azure functionapp publish $(functionAppName) --$(functionType)
+
+    - task: PublishBuildArtifacts@1
+      displayName: 'Publish Artifact'
+      inputs:
+        PathtoPublish: '$(Build.SourcesDirectory)/$(functionProjectPath)'
+        ArtifactName: 'FunctionApp.$(Build.BuildNumber)'
+        publishLocation: Container
+      condition: always()
