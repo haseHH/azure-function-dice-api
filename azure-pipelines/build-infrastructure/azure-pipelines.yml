@@ -1,3 +1,4 @@
+---
 name: $(BuildDefinitionName)_$(Date:yyyy-MM-dd).$(Rev:r)
 
 trigger:
@@ -6,21 +7,21 @@ trigger:
     - master
   paths:
     include:
-    - arm-templates\infrastructure\*
+    - arm-templates\*
     - azure-pipelines\build-infrastructure\*
 
 jobs:
 - job: ARMInfrastructure
-  displayName: Validation and DEV Deployment
+  displayName: Validation and Deployment
   pool:
     vmImage: 'windows-latest'
   variables:
     azureSubscriptionId: 'f10e7868-cfda-4bf8-b2ba-8c6e30bc3c74'
     azureLocation: 'West Europe'
-    resourceGroupName: 'che-dev-api-function-we'
-    templateBasePath: 'arm-templates\infrastructure'
+    resourceGroupName: 'hhh-dice-api-we'
+    templateBasePath: 'arm-templates'
     templateName: 'azuredeploy.json'
-    templateParametersName: 'azuredeploy.parameters-dev.json'
+    templateParametersName: 'azuredeploy.parameters.json'
 
   steps:
     - checkout: self

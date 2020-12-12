@@ -3,19 +3,19 @@
     "contentVersion": "1.0.0.0",
     "parameters": {
         "storageAccountName": {
-            "value": "chetstapifunctionsa"
+            "value": "hhhdiceapisa"
         },
         "logAnalyticsWorkspaceName": {
-            "value": "che-tst-api-function-law"
+            "value": "hhh-dice-api-law"
         },
         "applicationInsightsName": {
-            "value": "che-tst-api-function-ai"
+            "value": "hhh-dice-api-ai"
         },
         "consumptionPlanName": {
-            "value": "che-tst-api-function-asp"
+            "value": "hhh-dice-api-asp"
         },
         "functionAppName": {
-            "value": "che-tst-api-function-fa"
+            "value": "hhh-dice-api-fa"
         }
     }
 }

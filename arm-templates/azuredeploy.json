@@ -34,6 +34,7 @@
             "type": "Microsoft.Storage/storageAccounts",
             "apiVersion": "2019-06-01",
             "location": "[resourceGroup().location]",
+            "tags": "[resourceGroup().tags]",
             "kind": "StorageV2",
             "sku": {
                 "name": "Standard_LRS",
@@ -46,6 +47,7 @@
             "type": "Microsoft.OperationalInsights/workspaces",
             "apiVersion": "2020-08-01",
             "location": "[resourceGroup().location]",
+            "tags": "[resourceGroup().tags]",
             "properties": {
                 "sku": {
                     "name": "PerGB2018"
@@ -61,6 +63,7 @@
             "type": "Microsoft.Insights/components",
             "apiVersion": "2020-02-02-preview",
             "location": "[resourceGroup().location]",
+            "tags": "[resourceGroup().tags]",
             "dependsOn": [
                 "[parameters('logAnalyticsWorkspaceName')]"
             ],
@@ -78,6 +81,7 @@
             "type": "Microsoft.Web/serverfarms",
             "apiVersion": "2020-06-01",
             "location": "[resourceGroup().location]",
+            "tags": "[resourceGroup().tags]",
             "kind": "functionapp",
             "sku": {
                 "name": "Y1",
@@ -98,6 +102,7 @@
             "type": "Microsoft.Web/sites",
             "apiVersion": "2018-11-01",
             "location": "[resourceGroup().location]",
+            "tags": "[resourceGroup().tags]",
             "dependsOn": [
                 "[parameters('storageAccountName')]",
                 "[parameters('logAnalyticsWorkspaceName')]",
@@ -153,7 +158,7 @@
                 "[parameters('functionAppName')]",
                 "[parameters('logAnalyticsWorkspaceName')]"
             ],
-            "location": "westeurope",
+            "location": "[resourceGroup().location]",
             "properties": {
                 "workspaceId": "[variables('logAnalyticsWorkspaceId')]",
                 "logs": [
@@ -179,27 +184,5 @@
                 ]
             }
         }
-    ],
-    "outputs": {
-        "storageAccountId": {
-            "type": "string",
-            "value": "[variables('storageAccountId')]"
-        },
-        "storageAccountConnString": {
-            "type": "string",
-            "value": "[variables('storageAccountConnString')]"
-        },
-        "logAnalyticsWorkspaceId": {
-            "type": "string",
-            "value": "[variables('logAnalyticsWorkspaceId')]"
-        },
-        "applicationInsightsId": {
-            "type": "string",
-            "value": "[variables('applicationInsightsId')]"
-        },
-        "consumptionPlanId": {
-            "type": "string",
-            "value": "[variables('consumptionPlanId')]"
-        }
-    }
+    ]
 }

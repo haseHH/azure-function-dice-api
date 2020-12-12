@@ -1,3 +1,4 @@
+---
 name: $(BuildDefinitionName)_$(Date:yyyy-MM-dd).$(Rev:r)
 
 trigger:
@@ -6,21 +7,21 @@ trigger:
     - master
   paths:
     include:
-    - api-functions.main\dice-roller\*
+    - dice-roller\dice-roller\*
     - azure-pipelines\build-function-app\*
 
 jobs:
 - job: FunctionApp
-  displayName: Build and DEV Deployment
+  displayName: Build and Deployment
   pool:
     vmImage: 'windows-latest'
     demands:
       - DotNetFramework
       - azureps
   variables:
-    functionProjectPath: 'api-functions.main\dice-roller'
+    functionProjectPath: 'dice-roller\dice-roller'
     functionType: 'dotnet'
-    functionAppName: 'che-dev-api-function-fa'
+    functionAppName: 'hhh-dice-api-fa'
 
   steps:
     - checkout: self
