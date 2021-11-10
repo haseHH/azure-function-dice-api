@@ -2,11 +2,36 @@
 
 Ever wanted to toss 100 20-sided dice at once? Or some odd die, that doesn't roll well in reality? And resolve that with a JSON based API? Well then, here you go.
 
-This is a simple Azure Function App I wrote to remember some .NET basics. The base infrastructure can be deployed with the ARM template and the code itself can then be published using Visual Studio or the Azure Function Tools. Adjust and use as you like.
+This is a simple Azure Function App I wrote to remember some .NET basics. It can either be run as a container or directly on your Azure Subscription. The base infrastructure can be deployed with the ARM template and the code itself can then be published using Visual Studio or the Azure Function Tools. Adjust and use as you like.
 
-## Infrastructure
+## Deployment Options
 
-Click the button below to deploy the resources in your own Azure Tenant:
+### Container
+
+The Azure Functions Runtime [allows to build containers](https://docs.microsoft.com/en-us/azure/azure-functions/functions-create-function-linux-custom-image?tabs=in-process%2Cbash%2Cazure-cli&pivots=programming-language-csharp) and run them anywhere you see fit, like your local Docker Desktop environment, or even a Kubernetes Cluster if you wanna go a bit overkill (or have one running anyway for other purposes).
+
+Pull the container image from the [GitHub Container Registry](https://github.com/haseHH/azure-function-dice-api/pkgs/container/dice-roller-function) and start a container instance:
+
+```
+docker run -d -p 8080:80 --name dice-roller ghcr.io/hasehh/dice-roller-function:latest
+```
+
+Or build it yourself and run the container with that version:
+
+```
+docker build -t dice-roller-function:custom ./dice-roller/dice-roller/
+docker run -d -p 8080:80 --name dice-roller dice-roller-function:custom
+```
+
+Remove the container when no longer needed:
+
+```
+docker rm dice-roller --force
+```
+
+### Azure Infrastructure
+
+If you want to host the API in Azure, deploy the ARM template your favorite way or click the button below to deploy the resources in your own Azure Tenant:
 
 [![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FhaseHH%2Fazure-function-dice-api%2Fmain%2Farm-templates%2Fazuredeploy.json)
 
@@ -21,16 +46,19 @@ The template contains six resources:
 
 ## Calling the API
 
-After deploying the app code to your resources, you cann send HTTP GET requests to it. Or if you just want to make some tests (like, say, less than 20 requests per week) feel free to use my deployed instance. Either way, see the PowerShell code below for a few examples. You can request any (reasonable) number of many sided dice and add or subtract a modifier as needed.
+After deploying the app code to your resources or starting the container, you cann send HTTP GET requests to it. Or if you just want to make some tests (like, say, less than 20 requests per week) feel free to use my deployed instance. Either way, see the PowerShell code below for a few examples. You can request any (reasonable) number of many sided dice and add or subtract a modifier as needed.
 
 ```PowerShell
 # Roll them all!
+Invoke-RestMethod -Method GET -Uri 'http://localhost:8080/api/roll/100d20' -UseBasicParsing
 Invoke-RestMethod -Method GET -Uri 'http://hhh-dice-api-fa.azurewebsites.net/api/roll/100d20' -UseBasicParsing
 
 # Give me a realistic roll, and add some extra damage for my big axe.
+Invoke-RestMethod -Method GET -Uri 'http://localhost:8080/api/roll/1d8+5' -UseBasicParsing
 Invoke-RestMethod -Method GET -Uri 'http://hhh-dice-api-fa.azurewebsites.net/api/roll/1d8+5' -UseBasicParsing
 
 # I angered my DM. Now my staff got split while blocking an attack and I get some damage deducted...
+Invoke-RestMethod -Method GET -Uri 'http://localhost:8080/api/roll/2d4-2' -UseBasicParsing
 Invoke-RestMethod -Method GET -Uri 'http://hhh-dice-api-fa.azurewebsites.net/api/roll/2d4-2' -UseBasicParsing
 ```
 

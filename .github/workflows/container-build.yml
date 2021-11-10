@@ -1,0 +1,72 @@
+name: Container Build
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  container-build:
+    name: Container Build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v1
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push container image (Try 1)
+        id: try1
+        uses: docker/build-push-action@v2
+        with:
+          context: ./dice-roller/dice-roller/
+          push: true
+          tags: ghcr.io/hasehh/dice-roller-function:latest
+        timeout-minutes: 15
+        continue-on-error: true
+
+      - name: Build and push container image (Try 2)
+        id: try2
+        uses: docker/build-push-action@v2
+        with:
+          context: ./dice-roller/dice-roller/
+          push: true
+          tags: ghcr.io/hasehh/dice-roller-function:latest
+        timeout-minutes: 15
+        continue-on-error: true
+        if: steps.try1.outcome=='failure'
+
+      - name: Build and push container image (Try 3)
+        id: try3
+        uses: docker/build-push-action@v2
+        with:
+          context: ./dice-roller/dice-roller/
+          push: true
+          tags: ghcr.io/hasehh/dice-roller-function:latest
+        timeout-minutes: 15
+        continue-on-error: true
+        if: steps.try2.outcome=='failure'
+
+      - name: Build and push container image (Try 4)
+        id: try4
+        uses: docker/build-push-action@v2
+        with:
+          context: ./dice-roller/dice-roller/
+          push: true
+          tags: ghcr.io/hasehh/dice-roller-function:latest
+        timeout-minutes: 15
+        continue-on-error: true
+        if: steps.try3.outcome=='failure'
+
+      - name: Build and push container image (Try 5)
+        uses: docker/build-push-action@v2
+        with:
+          context: ./dice-roller/dice-roller/
+          push: true
+          tags: ghcr.io/hasehh/dice-roller-function:latest
+        timeout-minutes: 15
+        if: steps.try4.outcome=='failure'
