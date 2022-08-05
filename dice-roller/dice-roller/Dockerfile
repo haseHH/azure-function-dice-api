@@ -13,4 +13,4 @@ ENV AzureWebJobsScriptRoot=/home/site/wwwroot \
 
 COPY --from=installer-env ["/home/site/wwwroot", "/home/site/wwwroot"]
 
-LABEL org.opencontainers.image.source="https://github.com/haseHH/PHP-Minecraft-Query-Container"
+LABEL org.opencontainers.image.source="https://github.com/haseHH/azure-function-dice-api"
