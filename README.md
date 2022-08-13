@@ -8,25 +8,35 @@ This is a simple Azure Function App I wrote to remember some .NET basics. It can
 
 ### Container
 
-The Azure Functions Runtime [allows to build containers](https://docs.microsoft.com/en-us/azure/azure-functions/functions-create-function-linux-custom-image?tabs=in-process%2Cbash%2Cazure-cli&pivots=programming-language-csharp) and run them anywhere you see fit, like your local Docker Desktop environment, or even a Kubernetes Cluster if you wanna go a bit overkill (or have one running anyway for other purposes).
+The Azure Functions Runtime [allows to build containers](https://docs.microsoft.com/en-us/azure/azure-functions/functions-create-function-linux-custom-image?tabs=in-process%2Cbash%2Cazure-cli&pivots=programming-language-csharp) and run them anywhere you see fit, like your local Docker Desktop environment, or even a Kubernetes Cluster.
+
+#### Docker
 
 Pull the container image from the [GitHub Container Registry](https://github.com/haseHH/azure-function-dice-api/pkgs/container/dice-roller-function) and start a container instance:
 
-```
+```bash
 docker run -d -p 8080:80 --name dice-roller ghcr.io/hasehh/dice-roller-function:latest
 ```
 
 Or build it yourself and run the container with that version:
 
-```
+```bash
 docker build -t dice-roller-function:custom ./dice-roller/dice-roller/
 docker run -d -p 8080:80 --name dice-roller dice-roller-function:custom
 ```
 
 Remove the container when no longer needed:
 
-```
+```bash
 docker rm dice-roller --force
+```
+
+#### Kubernetes
+
+Take the [`dice-api.yml`](./kube/dice-api.yml), adjust it to match your setup and apply it to your cluster:
+
+```bash
+kubectl apply -f ./kube/dice-api.yml
 ```
 
 ### Azure Infrastructure
@@ -51,15 +61,15 @@ After deploying the app code to your resources or starting the container, you ca
 ```PowerShell
 # Roll them all!
 Invoke-RestMethod -Method GET -Uri 'http://localhost:8080/api/roll/100d20' -UseBasicParsing
-Invoke-RestMethod -Method GET -Uri 'http://hhh-dice-api-fa.azurewebsites.net/api/roll/100d20' -UseBasicParsing
+Invoke-RestMethod -Method GET -Uri 'https://dice-api.hase.hamburg/api/roll/100d20' -UseBasicParsing
 
 # Give me a realistic roll, and add some extra damage for my big axe.
 Invoke-RestMethod -Method GET -Uri 'http://localhost:8080/api/roll/1d8+5' -UseBasicParsing
-Invoke-RestMethod -Method GET -Uri 'http://hhh-dice-api-fa.azurewebsites.net/api/roll/1d8+5' -UseBasicParsing
+Invoke-RestMethod -Method GET -Uri 'https://dice-api.hase.hamburg/api/roll/1d8+5' -UseBasicParsing
 
 # I angered my DM. Now my staff got split while blocking an attack and I get some damage deducted...
 Invoke-RestMethod -Method GET -Uri 'http://localhost:8080/api/roll/2d4-2' -UseBasicParsing
-Invoke-RestMethod -Method GET -Uri 'http://hhh-dice-api-fa.azurewebsites.net/api/roll/2d4-2' -UseBasicParsing
+Invoke-RestMethod -Method GET -Uri 'https://dice-api.hase.hamburg/api/roll/2d4-2' -UseBasicParsing
 ```
 
 The API will then parse the requested dice from the end of the URI and roll up some random numbers for you. Example response:

@@ -1,0 +1,84 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: dice-api
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dice-api-deployment
+  namespace: dice-api
+  labels:
+    app: dice-api
+spec:
+  selector:
+    matchLabels:
+      app: dice-api
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: dice-api
+    spec:
+      containers:
+        - name: dice-api-container
+          image: ghcr.io/hasehh/dice-roller-function:latest
+          resources:
+            limits:
+              memory: 512Mi
+              cpu: "1"
+            requests:
+              memory: 256Mi
+              cpu: "0.2"
+          ports:
+            - containerPort: 80
+          livenessProbe:
+            httpGet:
+              port: 80
+              path: /api/roll/1d4
+              httpHeaders:
+                - name: Accept
+                  value: application/json
+          readinessProbe:
+            httpGet:
+              port: 80
+              path: /api/roll/1d4
+              httpHeaders:
+                - name: Accept
+                  value: application/json
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: dice-api-service
+  namespace: dice-api
+spec:
+  selector:
+    app: dice-api
+  type: ClusterIP
+  ports:
+    - port: 80
+      targetPort: 80
+      protocol: TCP
+
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: dice-api-ingress
+  namespace: dice-api
+spec:
+  rules:
+    - host: dice-api.hase.hamburg
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: dice-api-service
+                port:
+                  number: 80
